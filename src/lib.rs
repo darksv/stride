@@ -2,8 +2,8 @@
 //! spaced a constant `S` "stride" in memory.
 //!
 //! Where you want a strided slice use:
-//! - [`&Stride<T, S>`][`Stride`] instead of `&[T]`
-//! - [`&mut Stride<T, S>`][`Stride`] instead of `&mut [T]`
+//! - [`&Stride<T, S>`][`Stride`] instead of [`&[T]`][`slice`]
+//! - [`&mut Stride<T, S>`][`Stride`] instead of [`&mut [T]`][`slice`]
 
 #![no_std]
 
@@ -32,7 +32,7 @@ impl<T, const S: usize> Default for &mut Stride<T, S> {
 }
 
 impl<T, const S: usize> Stride<T, S> {
-    /// Construct a new strided slice.
+    /// Constructs a new strided slice.
     ///
     /// # Panics
     ///
@@ -51,7 +51,7 @@ impl<T, const S: usize> Stride<T, S> {
         unsafe { Self::new_unchecked(data) }
     }
 
-    /// Construct a new mutable strided slice.
+    /// Constructs a new mutable strided slice.
     ///
     /// # Panics
     ///
@@ -70,15 +70,38 @@ impl<T, const S: usize> Stride<T, S> {
         unsafe { Self::new_mut_unchecked(data) }
     }
 
+    /// Constructs a new strided slice without checking if the length is a
+    /// multiple of `S`.
+    ///
+    /// For a safe alternative see [`new()`][`Stride::new()`].
     pub unsafe fn new_unchecked(data: &[T]) -> &Self {
         &*(data as *const [T] as *const Self)
     }
 
+    /// Constructs a new mutable strided slice without checking if the length is
+    /// a multiple of `S`.
+    ///
+    /// For a safe alternative see [`new_mut()`][`Stride::new_mut()`].
     pub unsafe fn new_mut_unchecked(data: &[T]) -> &mut Self {
         &mut *(data as *const [T] as *mut Self)
     }
 
-    pub fn len(&self) -> usize {
+    /// Returns the number of elements in the strided slice.
+    ///
+    /// This is equivalent to the underlying slice length divided by `S`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use stride::Stride;
+    /// #
+    /// let slice = &[1, 2, 3, 4, 5, 6];
+    ///
+    /// assert_eq!(Stride::<_, 1>::new(slice).len(), 6);
+    /// assert_eq!(Stride::<_, 2>::new(slice).len(), 3);
+    /// assert_eq!(Stride::<_, 3>::new(slice).len(), 2);
+    /// ```
+    pub const fn len(&self) -> usize {
         self.data.len() / S
     }
 
