@@ -7,7 +7,10 @@
 
 #![no_std]
 
+mod iter;
 mod ops;
+
+pub use crate::iter::{Iter, IterMut};
 
 /// A constant strided slice.
 #[derive(Debug)]
@@ -77,5 +80,42 @@ impl<T, const S: usize> Stride<T, S> {
 
     pub fn len(&self) -> usize {
         self.data.len() / S
+    }
+
+    /// Returns an iterator over the stride.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use stride::Stride;
+    /// #
+    /// let stride = Stride::<_, 2>::new(&[1, 2, 3, 4, 5, 6]);
+    /// let mut iterator = stride.iter();
+    ///
+    /// assert_eq!(iterator.next(), Some(&1));
+    /// assert_eq!(iterator.next(), Some(&3));
+    /// assert_eq!(iterator.next(), Some(&5));
+    /// assert_eq!(iterator.next(), None);
+    /// ```
+    pub fn iter(&self) -> Iter<T, S> {
+        Iter::new(self)
+    }
+
+    /// Returns an iterator over the stride that allows modifying each value.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use stride::Stride;
+    /// #
+    /// let slice = &mut [1, 1, 2, 2, 3, 3];
+    /// let stride = Stride::<_, 2>::new_mut(slice);
+    /// for elem in stride.iter_mut() {
+    ///     *elem *= 2;
+    /// }
+    /// assert_eq!(slice, &[2, 1, 4, 2, 6, 3]);
+    /// ```
+    pub fn iter_mut(&mut self) -> IterMut<T, S> {
+        IterMut::new(self)
     }
 }
