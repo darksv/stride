@@ -62,7 +62,8 @@ impl<T, const S: usize> Stride<T, S> {
 
     /// Returns the number of elements in the strided slice.
     ///
-    /// This is equivalent to the underlying slice length divided by `S`.
+    /// This is equivalent to the ceiling division of the underlying slice
+    /// length by `S`.
     ///
     /// # Examples
     ///
@@ -76,7 +77,7 @@ impl<T, const S: usize> Stride<T, S> {
     /// assert_eq!(Stride::<_, 3>::new(slice).len(), 2);
     /// ```
     pub const fn len(&self) -> usize {
-        self.data.len() / S
+        (self.data.len() + S - 1) / S
     }
 
     /// Returns an iterator over the stride.
