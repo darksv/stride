@@ -13,6 +13,20 @@ fn stride_mut_default() {
 }
 
 #[test]
+fn stride_new_multiple() {
+    let stride = Stride::<_, 3>::new(&[1, 2, 3, 4, 5, 6]);
+    assert_eq!(stride[0], 1);
+    assert_eq!(stride[1], 4);
+}
+
+#[test]
+fn stride_new_non_multiple() {
+    let stride = Stride::<_, 3>::new(&[1, 2, 3, 4]);
+    assert_eq!(stride[0], 1);
+    assert_eq!(stride[1], 4);
+}
+
+#[test]
 fn stride_len() {
     let stride = Stride::<_, 3>::new(&[1, 2, 3, 4, 5, 6]);
     assert_eq!(stride.len(), 2);

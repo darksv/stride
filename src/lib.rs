@@ -34,10 +34,6 @@ impl<T, const S: usize> Default for &mut Stride<T, S> {
 impl<T, const S: usize> Stride<T, S> {
     /// Constructs a new strided slice.
     ///
-    /// # Panics
-    ///
-    /// If the len of `data` is not a multiple of `S`.
-    ///
     /// # Examples
     ///
     /// ```
@@ -47,15 +43,10 @@ impl<T, const S: usize> Stride<T, S> {
     /// let strided = Stride::<_, 3>::new(data);
     /// ```
     pub fn new(data: &[T]) -> &Self {
-        assert_eq!(data.len() % S, 0);
-        unsafe { Self::new_unchecked(data) }
+        unsafe { &*(data as *const [T] as *const Self) }
     }
 
     /// Constructs a new mutable strided slice.
-    ///
-    /// # Panics
-    ///
-    /// If the len of `data` is not a multiple of `S`.
     ///
     /// # Examples
     ///
@@ -66,24 +57,7 @@ impl<T, const S: usize> Stride<T, S> {
     /// let strided = Stride::<_, 3>::new_mut(data);
     /// ```
     pub fn new_mut(data: &mut [T]) -> &mut Self {
-        assert_eq!(data.len() % S, 0);
-        unsafe { Self::new_mut_unchecked(data) }
-    }
-
-    /// Constructs a new strided slice without checking if the length is a
-    /// multiple of `S`.
-    ///
-    /// For a safe alternative see [`new()`][`Stride::new()`].
-    pub unsafe fn new_unchecked(data: &[T]) -> &Self {
-        &*(data as *const [T] as *const Self)
-    }
-
-    /// Constructs a new mutable strided slice without checking if the length is
-    /// a multiple of `S`.
-    ///
-    /// For a safe alternative see [`new_mut()`][`Stride::new_mut()`].
-    pub unsafe fn new_mut_unchecked(data: &[T]) -> &mut Self {
-        &mut *(data as *const [T] as *mut Self)
+        unsafe { &mut *(data as *const [T] as *mut Self) }
     }
 
     /// Returns the number of elements in the strided slice.
