@@ -80,6 +80,22 @@ impl<T, const S: usize> Stride<T, S> {
         (self.data.len() + S - 1) / S
     }
 
+    /// Returns `true` if the strided slice has a length of 0.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use stride::Stride;
+    /// #
+    /// let slice = &[1, 2, 3, 4, 5, 6];
+    /// let stride = Stride::<_, 3>::new(slice);
+    ///
+    /// assert!(!stride.is_empty());
+    /// ```
+    pub const fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     /// Returns an iterator over the stride.
     ///
     /// # Examples
