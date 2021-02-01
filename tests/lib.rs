@@ -97,6 +97,19 @@ fn stride_partial_ne_values() {
 }
 
 #[test]
+fn stride_hash() {
+    let a = Stride::<_, 2>::new(&[1, 0, 4, 0]);
+    let b = Stride::<_, 2>::new(&[1, -1, 4, -1]);
+    let c = Stride::<_, 2>::new(&[1, -2, 4, -2]);
+    let mut map = std::collections::HashSet::new();
+    map.insert(a);
+    map.insert(b);
+    assert_eq!(map.len(), 1);
+    map.remove(c);
+    assert!(map.is_empty());
+}
+
+#[test]
 fn stride_partial_ord() {
     let a = Stride::<_, 3>::new(&[1, 0, 0, 3, 0, 0]);
     let b = Stride::<_, 2>::new(&[1, 0, 4, 0]);

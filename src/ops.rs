@@ -1,4 +1,5 @@
 use core::cmp::{self, Ordering};
+use core::hash::{Hash, Hasher};
 use core::ops::*;
 
 use crate::Stride;
@@ -16,6 +17,17 @@ where
 }
 
 impl<T, const S: usize> Eq for Stride<T, S> where T: Eq {}
+
+impl<T, const S: usize> Hash for Stride<T, S>
+where
+    T: Hash,
+{
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        for element in self {
+            element.hash(state);
+        }
+    }
+}
 
 impl<T, U, const S: usize, const R: usize> PartialOrd<Stride<U, R>> for Stride<T, S>
 where
