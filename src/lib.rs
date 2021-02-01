@@ -57,7 +57,7 @@ impl<T, const S: usize> Stride<T, S> {
     /// let strided = Stride::<_, 3>::new_mut(data);
     /// ```
     pub fn new_mut(data: &mut [T]) -> &mut Self {
-        unsafe { &mut *(data as *const [T] as *mut Self) }
+        unsafe { &mut *(data as *mut [T] as *mut Self) }
     }
 
     /// Returns the number of elements in the strided slice.
