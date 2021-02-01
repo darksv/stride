@@ -133,3 +133,22 @@ impl<T, const S: usize> Stride<T, S> {
         IterMut::new(self)
     }
 }
+
+impl<T> Stride<T, 1> {
+    /// Returns a slice containing the entire strided slice.
+    ///
+    /// Only available on strided slices with a stride of `1`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use stride::Stride;
+    /// #
+    /// let slice = &[1, 2, 3];
+    /// let strided = Stride::<_, 1>::new(slice);
+    /// assert_eq!(strided.as_slice(), slice);
+    /// ```
+    pub fn as_slice(&self) -> &[T] {
+        &self.data
+    }
+}
