@@ -97,6 +97,20 @@ fn stride_partial_ne_values() {
 }
 
 #[test]
+fn stride_partial_ord() {
+    let a = Stride::<_, 3>::new(&[1, 0, 0, 3, 0, 0]);
+    let b = Stride::<_, 2>::new(&[1, 0, 4, 0]);
+    assert!(a < b);
+}
+
+#[test]
+fn stride_partial_ord_len() {
+    let a = Stride::<_, 3>::new(&[1, 0, 0, 4, 0, 0]);
+    let b = Stride::<_, 2>::new(&[1, 0, 4, 0, 6]);
+    assert!(a < b);
+}
+
+#[test]
 fn stride_index() {
     let stride = Stride::<_, 3>::new(&[1, 2, 3, 4, 5, 6]);
     assert_eq!(stride[0], 1);
