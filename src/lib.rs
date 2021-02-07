@@ -151,4 +151,20 @@ impl<T> Stride<T, 1> {
     pub fn as_slice(&self) -> &[T] {
         &self.data
     }
+
+    /// Returns a mutable slice containing the entire strided slice.
+    ///
+    /// Only available on strided slices with a stride of `1`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use stride::Stride;
+    /// #
+    /// let slice = &mut [1, 2, 3];
+    /// let strided = Stride::<_, 1>::new_mut(slice);
+    /// ```
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        &mut self.data
+    }
 }
