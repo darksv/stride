@@ -109,6 +109,48 @@ fn stride_partial_ne_values() {
 }
 
 #[test]
+fn stride_partial_eq_array() {
+    let a = Stride::<_, 3>::new(&[1, 0, 0, 4, 0, 0]);
+    let b = &[1, 4];
+    assert_eq!(a, b);
+}
+
+#[test]
+fn stride_partial_ne_array_len() {
+    let a = Stride::<_, 3>::new(&[1, 0, 0, 4, 0, 0]);
+    let b = &[1, 4, 6];
+    assert_ne!(a, b);
+}
+
+#[test]
+fn stride_partial_ne_array_values() {
+    let a = Stride::<_, 3>::new(&[1, 0, 0, 4, 0, 0]);
+    let b = &[1, 5];
+    assert_ne!(a, &b[..]);
+}
+
+#[test]
+fn stride_partial_eq_slice() {
+    let a = Stride::<_, 3>::new(&[1, 0, 0, 4, 0, 0]);
+    let b = &[1, 4];
+    assert_eq!(a, b);
+}
+
+#[test]
+fn stride_partial_ne_slice_len() {
+    let a = Stride::<_, 3>::new(&[1, 0, 0, 4, 0, 0]);
+    let b = &[1, 4, 6];
+    assert_ne!(a, &b[..]);
+}
+
+#[test]
+fn stride_partial_ne_slice_values() {
+    let a = Stride::<_, 3>::new(&[1, 0, 0, 4, 0, 0]);
+    let b = &[1, 5];
+    assert_ne!(a, &b[..]);
+}
+
+#[test]
 fn stride_hash() {
     let a = Stride::<_, 2>::new(&[1, 0, 4, 0]);
     let b = Stride::<_, 2>::new(&[1, -1, 4, -1]);
