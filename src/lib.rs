@@ -1,9 +1,43 @@
 //! This library provides a slice like [`Stride<T, S>`] type where elements are
-//! spaced a constant `S` "stride" in memory.
+//! spaced a constant `S` elements in memory.
+//!
+//! For example, given an underlying slice `&[1, 2, 3, 4, 5]`, the elements
+//! `&[1, 3, 5]` are a strided slice with a stride of 2. This crate makes use of
+//! const generics to provide the stride amount `S` at compile time so that
+//! there is no runtime memory overhead to strided slices.
 //!
 //! Where you want a strided slice use:
-//! - [`&Stride<T, S>`][`Stride`] instead of [`&[T]`][`slice`]
-//! - [`&mut Stride<T, S>`][`Stride`] instead of [`&mut [T]`][`slice`]
+//! - [`&Stride<T, S>`][`Stride`] in the place of [`&[T]`][`slice`] constructed
+//!   using [`.new()`][`Stride::new`].
+//! - [`&mut Stride<T, S>`][`Stride`] in the place of [`&mut [T]`][`slice`]
+//!   constructed using [`.new_mut()`][`Stride::new_mut`].
+//!
+//! Many slice like operations are implemented for [`Stride<T, N>`] including
+//! iteration and indexing.
+//!
+//! ### Examples
+//!
+//! ```
+//! use stride::Stride;
+//!
+//! // The underlying data.
+//! let data = &mut [1, 2, 7, 4, 5, 6];
+//!
+//! // Create a strided slice with a stride of `2` referring to
+//! // elements `1`, `7`, and `5`.
+//! let stride = Stride::<_, 2>::new_mut(data);
+//!
+//! assert_eq!(stride.len(), 3);
+//!
+//! // We can use indexing to view values.
+//! assert_eq!(stride[0], 1);
+//! assert_eq!(stride[1], 7);
+//! assert_eq!(stride[2], 5);
+//!
+//! // .. and modify them.
+//! stride[1] = 3;
+//! assert_eq!(format!("{:?}", stride), "[1, 3, 5]");
+//! ```
 
 #![no_std]
 
@@ -47,10 +81,10 @@ impl<T, const S: usize> Stride<T, S> {
     /// # Examples
     ///
     /// ```
-    /// use stride::Stride;
-    ///
+    /// # use stride::Stride;
+    /// #
     /// let data = &[1, 2, 3, 4, 5, 6];
-    /// let strided = Stride::<_, 3>::new(data);
+    /// let stride = Stride::<_, 3>::new(data);
     /// ```
     pub fn new(data: &[T]) -> &Self {
         unsafe { &*(data as *const [T] as *const Self) }
@@ -61,10 +95,10 @@ impl<T, const S: usize> Stride<T, S> {
     /// # Examples
     ///
     /// ```
-    /// use stride::Stride;
-    ///
+    /// # use stride::Stride;
+    /// #
     /// let data = &mut [1, 2, 3, 4, 5, 6];
-    /// let strided = Stride::<_, 3>::new_mut(data);
+    /// let stride = Stride::<_, 3>::new_mut(data);
     /// ```
     pub fn new_mut(data: &mut [T]) -> &mut Self {
         unsafe { &mut *(data as *mut [T] as *mut Self) }
@@ -80,11 +114,10 @@ impl<T, const S: usize> Stride<T, S> {
     /// ```
     /// # use stride::Stride;
     /// #
-    /// let slice = &[1, 2, 3, 4, 5, 6];
-    ///
-    /// assert_eq!(Stride::<_, 1>::new(slice).len(), 6);
-    /// assert_eq!(Stride::<_, 2>::new(slice).len(), 3);
-    /// assert_eq!(Stride::<_, 3>::new(slice).len(), 2);
+    /// let data = &[1, 2, 3, 4, 5, 6];
+    /// assert_eq!(Stride::<_, 1>::new(data).len(), 6);
+    /// assert_eq!(Stride::<_, 2>::new(data).len(), 3);
+    /// assert_eq!(Stride::<_, 3>::new(data).len(), 2);
     /// ```
     pub const fn len(&self) -> usize {
         (self.data.len() + S - 1) / S
@@ -97,9 +130,7 @@ impl<T, const S: usize> Stride<T, S> {
     /// ```
     /// # use stride::Stride;
     /// #
-    /// let slice = &[1, 2, 3, 4, 5, 6];
-    /// let stride = Stride::<_, 3>::new(slice);
-    ///
+    /// let stride = Stride::<_, 3>::new(&[1, 2, 3, 4, 5, 6]);
     /// assert!(!stride.is_empty());
     /// ```
     pub const fn is_empty(&self) -> bool {
@@ -115,7 +146,6 @@ impl<T, const S: usize> Stride<T, S> {
     /// #
     /// let stride = Stride::<_, 2>::new(&[1, 2, 3, 4, 5, 6]);
     /// let mut iterator = stride.iter();
-    ///
     /// assert_eq!(iterator.next(), Some(&1));
     /// assert_eq!(iterator.next(), Some(&3));
     /// assert_eq!(iterator.next(), Some(&5));
@@ -155,8 +185,8 @@ impl<T> Stride<T, 1> {
     /// # use stride::Stride;
     /// #
     /// let slice = &[1, 2, 3];
-    /// let strided = Stride::<_, 1>::new(slice);
-    /// assert_eq!(strided.as_slice(), slice);
+    /// let stride = Stride::<_, 1>::new(slice);
+    /// assert_eq!(stride.as_slice(), slice);
     /// ```
     pub fn as_slice(&self) -> &[T] {
         &self.data
@@ -171,8 +201,10 @@ impl<T> Stride<T, 1> {
     /// ```
     /// # use stride::Stride;
     /// #
-    /// let slice = &mut [1, 2, 3];
-    /// let strided = Stride::<_, 1>::new_mut(slice);
+    /// let slice = &mut [1, 2, 7];
+    /// let stride = Stride::<_, 1>::new_mut(slice);
+    /// stride.as_mut_slice()[2] = 3;
+    /// assert_eq!(slice, &[1, 2, 3])
     /// ```
     pub fn as_mut_slice(&mut self) -> &mut [T] {
         &mut self.data
