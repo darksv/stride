@@ -10,13 +10,23 @@
 mod iter;
 mod ops;
 
+use core::fmt;
+
 pub use crate::iter::{Iter, IterMut};
 
 /// A constant strided slice.
-#[derive(Debug)]
 #[repr(transparent)]
 pub struct Stride<T, const S: usize> {
     data: [T],
+}
+
+impl<T, const S: usize> fmt::Debug for Stride<T, S>
+where
+    T: fmt::Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list().entries(self.iter()).finish()
+    }
 }
 
 impl<T, const S: usize> Default for &Stride<T, S> {

@@ -39,6 +39,18 @@ fn stride_len_non_multiple() {
 }
 
 #[test]
+fn stride_debug() {
+    let stride = Stride::<_, 1>::new(&[1, 2, 3, 4, 5]);
+    assert_eq!(format!("{:?}", stride), "[1, 2, 3, 4, 5]");
+
+    let stride = Stride::<_, 2>::new(&[1, 2, 3, 4, 5]);
+    assert_eq!(format!("{:?}", stride), "[1, 3, 5]");
+
+    let stride = Stride::<_, 3>::new(&[1, 2, 3, 4, 5]);
+    assert_eq!(format!("{:?}", stride), "[1, 4]");
+}
+
+#[test]
 fn stride_iter() {
     let stride = Stride::<_, 2>::new(&[1, 2, 3, 4, 5, 6]);
     let vec: Vec<_> = stride.iter().collect();
