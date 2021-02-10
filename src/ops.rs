@@ -13,12 +13,37 @@ where
     }
 }
 
+fn partial_eq_slice<T, U, const S: usize>(stride: &Stride<T, S>, slice: &[U]) -> bool
+where
+    T: PartialEq<U>,
+{
+    stride.len() == slice.len() && stride.iter().zip(slice.iter()).all(|(a, b)| a == b)
+}
+
 impl<T, U, const S: usize, const N: usize> PartialEq<[U; N]> for Stride<T, S>
 where
     T: PartialEq<U>,
 {
     fn eq(&self, other: &[U; N]) -> bool {
-        self.len() == other.len() && self.iter().zip(other.iter()).all(|(a, b)| a == b)
+        partial_eq_slice(self, &*other)
+    }
+}
+
+impl<T, U, const S: usize, const N: usize> PartialEq<&[U; N]> for Stride<T, S>
+where
+    T: PartialEq<U>,
+{
+    fn eq(&self, other: &&[U; N]) -> bool {
+        partial_eq_slice(self, *other)
+    }
+}
+
+impl<T, U, const S: usize> PartialEq<&[U]> for Stride<T, S>
+where
+    T: PartialEq<U>,
+{
+    fn eq(&self, other: &&[U]) -> bool {
+        partial_eq_slice(self, other)
     }
 }
 
@@ -27,7 +52,7 @@ where
     T: PartialEq<U>,
 {
     fn eq(&self, other: &[U]) -> bool {
-        self.len() == other.len() && self.iter().zip(other.iter()).all(|(a, b)| a == b)
+        partial_eq_slice(self, other)
     }
 }
 
