@@ -1,23 +1,22 @@
-//! This library provides a slice like [`Stride<T, S>`] type where elements are
+//! This crate provides a slice-like [`Stride<T, S>`] type where elements are
 //! spaced a constant `S` elements in memory.
 //!
-//! For example, given an underlying slice `&[1, 2, 3, 4, 5]`, the elements
+//! For example, given an underlying slice `&[1, 2, 3, 4, 5, 6]`, the elements
 //! `&[1, 3, 5]` are a strided slice with a stride of 2. This crate makes use of
-//! const generics to provide the stride amount `S` at compile time so that
-//! there is no runtime memory overhead to strided slices.
+//! const generics to provide the stride value `S` at compile time so that there
+//! is no runtime memory overhead to strided slices; `Stride` takes up the same
+//! amount of space as a slice.
+//!
+//! Many slice-like operations are implemented for `Stride` including iteration
+//! and indexing. Method names are similar to those of the slice type.
 //!
 //! Where you want a strided slice use:
-//! - [`&Stride<T, S>`][`Stride`] in the place of [`&[T]`][`slice`] constructed
-//!   using [`.new()`][`Stride::new`].
-//! - [`&mut Stride<T, S>`][`Stride`] in the place of [`&mut [T]`][`slice`]
-//!   constructed using [`.new_mut()`][`Stride::new_mut`].
+//! - [`::new()`][`Stride::new`] to construct a [`&Stride<T, S>`][`Stride`] that
+//!   wraps a [`&[T]`][`slice`].
+//! - [`::new_mut()`][`Stride::new_mut`] to construct a
+//!   [`&mut Stride<T, S>`][`Stride`] that wraps a [`&mut [T]`][`slice`].
 //!
-//! Many slice like operations are implemented for [`Stride<T, N>`] including
-//! iteration and indexing.
-//!
-//! ### Examples
-//!
-//! ```
+//! ```rust
 //! use stride::Stride;
 //!
 //! // The underlying data.
@@ -29,14 +28,14 @@
 //!
 //! assert_eq!(stride.len(), 3);
 //!
-//! // We can use indexing to view values.
+//! // We can use indexing to view values ..
 //! assert_eq!(stride[0], 1);
-//! assert_eq!(stride[1], 7);
-//! assert_eq!(stride[2], 5);
+//! assert_eq!(stride[1..3], &[7, 5]);
 //!
-//! // .. and modify them.
+//! // .. or modify them.
 //! stride[1] = 3;
-//! assert_eq!(format!("{:?}", stride), "[1, 3, 5]");
+//! assert_eq!(stride, &[1, 3, 5]);
+//! assert_eq!(data, &[1, 2, 3, 4, 5, 6]);
 //! ```
 
 #![no_std]
