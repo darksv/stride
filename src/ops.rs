@@ -2,7 +2,7 @@ use core::cmp::{self, Ordering};
 use core::hash::{Hash, Hasher};
 use core::ops::*;
 
-use crate::Stride;
+use crate::{Stride, StrideIndex};
 
 impl<T, U, const S: usize, const R: usize> PartialEq<Stride<U, R>> for Stride<T, S>
 where
@@ -76,16 +76,22 @@ where
     }
 }
 
-impl<T, const S: usize> Index<usize> for Stride<T, S> {
-    type Output = T;
+impl<I, T, const S: usize> Index<I> for Stride<T, S>
+where
+    I: StrideIndex<Self>,
+{
+    type Output = I::Output;
 
-    fn index(&self, idx: usize) -> &Self::Output {
-        &self.data[idx * S]
+    fn index(&self, index: I) -> &Self::Output {
+        index.index(self)
     }
 }
 
-impl<T, const S: usize> IndexMut<usize> for Stride<T, S> {
-    fn index_mut(&mut self, idx: usize) -> &mut Self::Output {
-        &mut self.data[idx * S]
+impl<I, T, const S: usize> IndexMut<I> for Stride<T, S>
+where
+    I: StrideIndex<Self>,
+{
+    fn index_mut(&mut self, index: I) -> &mut Self::Output {
+        index.index_mut(self)
     }
 }

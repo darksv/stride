@@ -40,12 +40,15 @@
 //! ```
 
 #![no_std]
+#![allow(unused_unsafe)]
 
+mod index;
 mod iter;
 mod ops;
 
 use core::fmt;
 
+pub use crate::index::StrideIndex;
 pub use crate::iter::{Iter, IterMut};
 
 /// A constant strided slice.
@@ -135,6 +138,95 @@ impl<T, const S: usize> Stride<T, S> {
     /// ```
     pub const fn is_empty(&self) -> bool {
         self.len() == 0
+    }
+
+    /// Returns a reference to an element or substride depending on the type of
+    /// index.
+    ///
+    /// - If given a position, returns a reference to the element at that
+    ///   position or `None` if out of bounds.
+    /// - If given a range, returns the substride corresponding to that range,
+    ///   or `None` if out of bounds.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use stride::Stride;
+    /// #
+    /// let stride = Stride::<_, 2>::new(&[1, 2, 3, 4, 5, 6]);
+    /// assert_eq!(stride.get(1), Some(&3));
+    /// assert_eq!(stride.get(0..2), Some(Stride::<_, 2>::new(&[1, 2, 3, 4])));
+    /// assert_eq!(stride.get(3), None);
+    /// assert_eq!(stride.get(0..4), None);
+    /// ```
+    pub fn get<I>(&self, index: I) -> Option<&I::Output>
+    where
+        I: StrideIndex<Stride<T, S>>,
+    {
+        index.get(self)
+    }
+
+    /// Returns a mutable reference to an element or substride depending on the
+    /// type of index (see [`get`]) or `None` if the index is out of bounds.
+    ///
+    /// [`get`]: #method.get
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use stride::Stride;
+    /// #
+    /// let data = &mut [0, 1, 2, 3];
+    /// let stride = Stride::<_, 2>::new_mut(data);
+    ///
+    /// if let Some(elem) = stride.get_mut(1) {
+    ///     *elem = 42;
+    /// }
+    /// assert_eq!(stride, Stride::<_, 2>::new(&[0, 1, 42, 3]));
+    /// ```
+    pub fn get_mut<I>(&mut self, index: I) -> Option<&mut I::Output>
+    where
+        I: StrideIndex<Stride<T, S>>,
+    {
+        index.get_mut(self)
+    }
+
+    /// Returns a reference to an element or substride, without doing bounds
+    /// checking.
+    ///
+    /// For a safe alternative see [`get`].
+    ///
+    /// # Safety
+    ///
+    /// Calling this method with an out-of-bounds index is *[undefined behavior]*
+    /// even if the resulting reference is not used.
+    ///
+    /// [`get`]: #method.get
+    /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    pub unsafe fn get_unchecked<I>(&self, index: I) -> &I::Output
+    where
+        I: StrideIndex<Self>,
+    {
+        unsafe { &*index.get_unchecked(self) }
+    }
+
+    /// Returns a mutable reference to an element or substride, without doing
+    /// bounds checking.
+    ///
+    /// For a safe alternative see [`get_mut`].
+    ///
+    /// # Safety
+    ///
+    /// Calling this method with an out-of-bounds index is *[undefined behavior]*
+    /// even if the resulting reference is not used.
+    ///
+    /// [`get_mut`]: #method.get_mut
+    /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    pub unsafe fn get_unchecked_mut<I>(&mut self, index: I) -> &mut I::Output
+    where
+        I: StrideIndex<Self>,
+    {
+        unsafe { &mut *index.get_unchecked_mut(self) }
     }
 
     /// Returns an iterator over the stride.
