@@ -252,6 +252,20 @@ impl<T, const S: usize> Stride<T, S> {
         self.get_mut(self.len().saturating_sub(1))
     }
 
+    /// Swaps two elements in the strided slice.
+    ///
+    /// # Arguments
+    ///
+    /// `a` - The index of the first element
+    /// `b` - The index of the second element
+    ///
+    /// # Panics
+    ///
+    /// If `a` or `b` are out of bounds.
+    pub fn swap(&mut self, a: usize, b: usize) {
+        self.data.swap(a * S, b * S)
+    }
+
     /// Returns an iterator over the stride.
     ///
     /// # Examples

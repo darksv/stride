@@ -107,3 +107,14 @@ fn stride_last_mut_empty() {
     let stride = <&mut Stride<i32, 2>>::default();
     assert_eq!(stride.last_mut(), None);
 }
+
+#[test]
+fn stride_swap() {
+    let data = &mut [1, 2, 3, 4, 5, 6];
+    let stride = Stride::<_, 2>::new_mut(data);
+    assert_eq!(stride, &[1, 3, 5]);
+    stride.swap(1, 2);
+    assert_eq!(stride, &[1, 5, 3]);
+    stride.swap(2, 1);
+    assert_eq!(stride, &[1, 3, 5]);
+}
