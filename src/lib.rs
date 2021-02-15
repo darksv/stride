@@ -228,6 +228,30 @@ impl<T, const S: usize> Stride<T, S> {
         unsafe { &mut *index.get_unchecked_mut(self) }
     }
 
+    /// Returns a reference to the first element of the strided slice, or `None`
+    /// if it is empty.
+    pub fn first(&self) -> Option<&T> {
+        self.get(0)
+    }
+
+    /// Returns a mutable reference to the first element of the strided slice,
+    /// or `None` if it is empty.
+    pub fn first_mut(&mut self) -> Option<&mut T> {
+        self.get_mut(0)
+    }
+
+    /// Returns a reference to the last element of the strided slice, or `None`
+    /// if it is empty.
+    pub fn last(&self) -> Option<&T> {
+        self.get(self.len().saturating_sub(1))
+    }
+
+    /// Returns a mutable reference to the last element of the strided slice, or
+    /// `None` if it is empty.
+    pub fn last_mut(&mut self) -> Option<&mut T> {
+        self.get_mut(self.len().saturating_sub(1))
+    }
+
     /// Returns an iterator over the stride.
     ///
     /// # Examples
