@@ -139,6 +139,20 @@ impl<T, const S: usize> Stride<T, S> {
         self.len() == 0
     }
 
+    /// Returns a raw pointer to the underlying slice's buffer.
+    ///
+    /// *See [`slice::as_ptr()`].*
+    pub const fn as_ptr(&self) -> *const T {
+        self.data.as_ptr()
+    }
+
+    /// Returns an unsafe mutable pointer to the underlying slice's buffer.
+    ///
+    /// *See [`slice::as_mut_ptr()`].*
+    pub fn as_mut_ptr(&mut self) -> *mut T {
+        self.data.as_mut_ptr()
+    }
+
     /// Returns a reference to an element or substride depending on the type of
     /// index.
     ///
@@ -256,8 +270,8 @@ impl<T, const S: usize> Stride<T, S> {
     ///
     /// # Arguments
     ///
-    /// `a` - The index of the first element
-    /// `b` - The index of the second element
+    /// - `a` - The index of the first element
+    /// - `b` - The index of the second element
     ///
     /// # Panics
     ///

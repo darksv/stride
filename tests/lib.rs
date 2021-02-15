@@ -54,6 +54,26 @@ fn stride_len_non_multiple() {
 }
 
 #[test]
+fn stride_as_ptr() {
+    let data = &[1, 2, 3, 4, 5, 6];
+    let stride = Stride::<_, 2>::new(data);
+    assert!(core::ptr::eq(data.as_ptr(), stride.as_ptr()));
+}
+
+#[test]
+fn stride_as_mut_ptr() {
+    let data = &mut [1, 2, 3, 4, 5, 6];
+    let stride = Stride::<_, 2>::new_mut(data);
+    let stride_ptr = stride.as_mut_ptr();
+    for i in (0..data.len()).step_by(2) {
+        unsafe {
+            *stride_ptr.add(i) *= 2;
+        }
+    }
+    assert_eq!(data, &[2, 2, 6, 4, 10, 6]);
+}
+
+#[test]
 fn stride_first() {
     let stride = Stride::<_, 2>::new(&[1, 2, 3, 4, 5, 6]);
     assert_eq!(stride.first(), Some(&1));
